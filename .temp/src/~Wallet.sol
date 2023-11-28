@@ -2,9 +2,13 @@
 pragma solidity ^0.8.12;
 
 import {IEntryPoint} from "account-abstraction/interfaces/IEntryPoint.sol";
+// This represents the basic account implementation for a smart contract wallet
 import {BaseAccount} from "account-abstraction/core/BaseAccount.sol";
+// This is a struct for representing a UserOperation
 import {UserOperation} from "account-abstraction/interfaces/UserOperation.sol";
+// This is used to validate signatures through the ECDSA library
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+// This contract provides us with modifiers like initializer that ensure certain initialization functions only run once.
 import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 import {TokenCallbackHandler} from "account-abstraction/samples/callback/TokenCallbackHandler.sol";
@@ -15,10 +19,11 @@ contract Wallet is
     UUPSUpgradeable,
     TokenCallbackHandler
 {
-    //used to validate signatures
-using ECDSA for bytes32;
-address[] public owners;
+        //To allow all bytes32 variables to use the functions in ECDSA - which we can then use to validate signatures as they're passed in as bytes32 values.
+    using ECDSA for bytes32;
+    address[] public owners;
 
+    //to keep track of the EntryPoint and the WalletFactory addresses
     address public immutable walletFactory;
     IEntryPoint private immutable _entryPoint;
 
@@ -35,13 +40,13 @@ modifier _requireFromEntryPointOrFactory() {
         _entryPoint = anEntryPoint;
         walletFactory = ourWalletFactory;
     }
-
-//returns entrypoint we saved earlier
+//This function will return the _entryPoint that we have saved in the _entryPoint state variable.
     function entryPoint() public view override returns (IEntryPoint) {
     return _entryPoint;
  }
 
-function _validateSignature(
+//this function will be used to validate the signatures of all the owners of a given smart contract wallet.
+ function _validateSignature(
         UserOperation calldata userOp, // UserOperation data structure passed as input
         bytes32 userOpHash // Hash of the UserOperation without the signatures
     ) internal view override returns (uint256) {
@@ -62,7 +67,6 @@ function _validateSignature(
         // If all signatures are valid (i.e., they all belong to the owners), return 0
         return 0;
 }
-
 
 function initialize(address[] memory initialOwners) public initializer {
     _initialize(initialOwners);
@@ -105,11 +109,13 @@ function executeBatch(
     }
 }
 
-function _authorizeUpgrade(
+
+    function _authorizeUpgrade(
         address
     ) internal view override _requireFromEntryPointOrFactory {}
 
-function encodeSignatures(
+
+    function encodeSignatures(
 
     bytes[] memory signatures
 
@@ -132,5 +138,4 @@ function addDeposit() public payable {
 }
 
 receive() external payable {}
-
 }

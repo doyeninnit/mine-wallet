@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.12;
 
-import "forge-std/Script.sol";
-import "../src/WalletFactory.sol";
+import "forge-std/~Script.sol";
+import "../src/~WalletFactory.sol";
 import {IEntryPoint} from "account-abstraction/interfaces/IEntryPoint.sol";
 
 contract WalletFactoryScript is Script {

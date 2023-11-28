@@ -1,3 +1,4 @@
+
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.12;
 
@@ -34,7 +35,6 @@ contract WalletFactory {
     // Use the hash and the salt to compute the counterfactual address of the proxy
     return Create2.computeAddress(bytes32(salt), bytecodeHash);
 }
-
 
 function createAccount(
     address[] memory owners,
